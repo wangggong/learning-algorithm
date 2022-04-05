@@ -70,50 +70,105 @@
 // - 多次整体修改某个区间，求区间和：「线段树」、「树状数组」（看修改区间的数据范围）
 // - 多次将某个区间变成同一个数，求区间和：「线段树」、「树状数组」（看修改区间的数据范围）
 
+/*
+ * func lowBit(x int) int { return x & -x }
+ *
+ * type NumArray struct {
+ * 	Size int
+ * 	Nums []int
+ * 	Tree []int
+ * }
+ *
+ * func Constructor(nums []int) NumArray {
+ * 	size := len(nums)
+ * 	tree := make([]int, size+1)
+ * 	na := NumArray{Size: size, Nums: nums, Tree: tree}
+ * 	for i, n := range nums {
+ * 		na.add(i+1, n)
+ * 	}
+ * 	return na
+ * }
+ *
+ * // ["NumArray","sumRange","update","sumRange"]\n[[[-1]],[0,0],[0,1],[0,0]]
+ * func (this *NumArray) query(x int) int {
+ * 	ans := 0
+ * 	for i := x; i > 0; i -= lowBit(i) {
+ * 		// fmt.Printf("query: %v %v\n", i, this.Tree[i])
+ * 		ans += this.Tree[i]
+ * 	}
+ * 	return ans
+ * }
+ *
+ * func (this *NumArray) add(x, v int) {
+ * 	for i := x; i <= this.Size; i += lowBit(i) {
+ * 		// fmt.Printf("add: %v %v\n", i, this.Tree[i])
+ * 		this.Tree[i] += v
+ * 	}
+ * }
+ *
+ * func (this *NumArray) Update(index int, val int) {
+ * 	// assert index < this.Size;
+ * 	this.add(index+1, val-this.Nums[index])
+ * 	this.Nums[index] = val
+ * }
+ *
+ * func (this *NumArray) SumRange(left int, right int) int {
+ * 	// assert left >= 0 && left < right && right < len(this.Nums);
+ * 	return this.query(right+1) - this.query(left)
+ * }
+ */
+
+// 20220404 更新: 每日一题出了这个, 爷自己写出来了! (虽然中间 WA 了一发, 忘了更新原数组
+//
+// 主要树状数组实现起来其实还挺简单的:
+// - 更新: `for x := ind; x < len(arr); x += lowBit(x) { arr[x] += diff }`
+// - 查询: `for x := ind; x > 0; x -= lowBit(x) { ans += arr[x] }`
 func lowBit(x int) int { return x & -x }
 
-type NumArray struct {
-	Size int
-	Nums []int
-	Tree []int
-}
+type Tree []int
 
-func Constructor(nums []int) NumArray {
-	size := len(nums)
-	tree := make([]int, size+1)
-	na := NumArray{Size: size, Nums: nums, Tree: tree}
-	for i, n := range nums {
-		na.add(i+1, n)
-	}
-	return na
-}
-
-// ["NumArray","sumRange","update","sumRange"]\n[[[-1]],[0,0],[0,1],[0,0]]
-func (this *NumArray) query(x int) int {
+func (t *Tree) query(ind int) int {
 	ans := 0
-	for i := x; i > 0; i -= lowBit(i) {
-		// fmt.Printf("query: %v %v\n", i, this.Tree[i])
-		ans += this.Tree[i]
+	for x := ind; x > 0; x -= lowBit(x) {
+		ans += (*t)[x]
 	}
 	return ans
 }
 
-func (this *NumArray) add(x, v int) {
-	for i := x; i <= this.Size; i += lowBit(i) {
-		// fmt.Printf("add: %v %v\n", i, this.Tree[i])
-		this.Tree[i] += v
+func (t *Tree) update(ind, val int) {
+	for x := ind; x < len(*t); x += lowBit(x) {
+		(*t)[x] += val
 	}
 }
 
-func (this *NumArray) Update(index int, val int) {
-	// assert index < this.Size;
-	this.add(index+1, val-this.Nums[index])
-	this.Nums[index] = val
+func NewTree(arr []int) *Tree {
+	t := Tree(make([]int, len(arr)+1))
+	tree := &t
+	for i, a := range arr {
+		tree.update(i+1, a)
+	}
+	return tree
 }
 
-func (this *NumArray) SumRange(left int, right int) int {
-	// assert left >= 0 && left < right && right < len(this.Nums);
-	return this.query(right+1) - this.query(left)
+type NumArray struct {
+	arr  []int
+	tree *Tree
+}
+
+func Constructor(nums []int) NumArray {
+	return NumArray{
+		arr:  nums,
+		tree: NewTree(nums),
+	}
+}
+
+func (na *NumArray) Update(index int, val int) {
+	na.tree.update(index+1, val-na.arr[index])
+	na.arr[index] = val
+}
+
+func (na *NumArray) SumRange(left int, right int) int {
+	return na.tree.query(right+1) - na.tree.query(left)
 }
 
 /**
