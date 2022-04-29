@@ -175,3 +175,68 @@ func heapify(arr []int, k, n int) {
 	}
 	return
 }
+
+/*
+ * // 真·堆排序, 出自《算法》
+ * type Heap struct {
+ * 	Arr  []int
+ * 	Size int
+ * }
+ * 
+ * func (h Heap) swim(k int) {
+ * 	for ; k > 1 && h.Arr[k] < h.Arr[k>>1]; k >>= 1 {
+ * 		h.Arr[k], h.Arr[k>>1] = h.Arr[k>>1], h.Arr[k]
+ * 	}
+ * 	return
+ * }
+ * 
+ * func (h Heap) sink(k int) {
+ * 	for (k << 1) <= h.Size {
+ * 		j := k << 1
+ * 		if j < h.Size && h.Arr[j+1] < h.Arr[j] {
+ * 			j++
+ * 		}
+ * 		if h.Arr[k] < h.Arr[j] {
+ * 			j = k
+ * 		}
+ * 		if j == k {
+ * 			break
+ * 		}
+ * 		h.Arr[j], h.Arr[k] = h.Arr[k], h.Arr[j]
+ * 		k = j
+ * 	}
+ * }
+ * 
+ * func (h *Heap) Push(v int) {
+ * 	h.Size++
+ * 	h.Arr[h.Size] = v
+ * 	k := h.Size
+ * 	h.swim(k)
+ * }
+ * 
+ * func (h *Heap) Pop() int {
+ * 	max := h.Arr[1]
+ * 	h.Arr[1], h.Arr[h.Size] = h.Arr[h.Size], h.Arr[1]
+ * 	h.Size--
+ * 	h.sink(1)
+ * 	return max
+ * }
+ * 
+ * func NewHeap(n int) *Heap {
+ * 	return &Heap{
+ * 		Arr: make([]int, n+1),
+ * 	}
+ * }
+ * 
+ * func sortArray(arr []int) []int {
+ * 	n := len(arr)
+ * 	h := NewHeap(n)
+ * 	for _, a := range arr {
+ * 		h.Push(a)
+ * 	}
+ * 	for i := range arr {
+ * 		arr[i] = h.Pop()
+ * 	}
+ * 	return arr
+ * }
+ */

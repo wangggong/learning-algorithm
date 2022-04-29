@@ -106,3 +106,33 @@ func reverseKGroup(head *ListNode, k int) *ListNode {
 	}
 	return dummy.Next
 }
+
+/*
+ * // 大逻辑拆小逻辑可能还好写点.
+ * func reverseKGroup(head *ListNode, k int) *ListNode {
+ * 	dummy := &ListNode{Val: -1, Next: head}
+ * 	prev := dummy
+ * 	for head != nil {
+ * 		tail := head
+ * 		for i := 1; i < k && tail != nil; i++ {
+ * 			tail = tail.Next
+ * 		}
+ * 		if tail == nil {
+ * 			break
+ * 		}
+ * 		next := tail.Next
+ * 		reverse(head, tail)
+ * 		prev.Next, head.Next = tail, next
+ * 		prev, head = head, next
+ * 	}
+ * 	return dummy.Next
+ * }
+ * 
+ * func reverse(head, tail *ListNode) {
+ * 	var prev, curr, next *ListNode
+ * 	for curr = head; prev != tail; prev, curr = curr, next {
+ * 		next = curr.Next
+ * 		curr.Next = prev
+ * 	}
+ * }
+ */

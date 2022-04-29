@@ -97,3 +97,36 @@ func inSubTree(root, node *TreeNode) bool {
 	}
 	return inSubTree(root.Left, node) || inSubTree(root.Right, node)
 }
+
+/*
+ * // 其实也不用判定右子树的...
+ * func lowestCommonAncestor(root, p, q *TreeNode) *TreeNode {
+ * 	if root == nil || p == nil || q == nil {
+ * 		return nil
+ * 	}
+ * 	if p == root || q == root {
+ * 		return root
+ * 	}
+ * 	pLeft, qLeft := inSubTree(root.Left, p), inSubTree(root.Left, q)
+ * 	if pLeft != qLeft {
+ * 		return root
+ * 	}
+ * 	switch pLeft {
+ * 	case true:
+ * 		return lowestCommonAncestor(root.Left, p, q)
+ * 	case false:
+ * 		return lowestCommonAncestor(root.Right, p, q)
+ * 	default:
+ * 		// unreachable
+ * 	}
+ * 	return nil
+ * }
+ * 
+ * func inSubTree(root, node *TreeNode) bool {
+ * 	// assert node != nil;
+ * 	if root == nil {
+ * 		return false
+ * 	}
+ * 	return root == node || inSubTree(root.Left, node) || inSubTree(root.Right, node)
+ * }
+ */

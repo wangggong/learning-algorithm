@@ -65,38 +65,60 @@
  *     Right *TreeNode
  * }
  */
+
+/*
+ * func countNodes(root *TreeNode) int {
+ * 	if root == nil {
+ * 		return 0
+ * 	}
+ * 	depth := 0
+ * 	curr := root
+ * 	for curr != nil {
+ * 		curr = curr.Left
+ * 		depth++
+ * 	}
+ * 	left, right := (1 << (depth - 1)), (1<<depth)-1
+ * 	for left < right {
+ * 		mid := (left + right + 1) >> 1
+ * 		if hasDepth(root, mid, depth) {
+ * 			left = mid
+ * 		} else {
+ * 			right = mid - 1
+ * 		}
+ * 	}
+ * 	return left
+ * }
+ *
+ * func hasDepth(root *TreeNode, k, depth int) bool {
+ * 	for i := depth - 2; i >= 0; i-- {
+ * 		if root == nil {
+ * 			return false
+ * 		}
+ * 		if (k>>i)&1 != 0 {
+ * 			root = root.Right
+ * 		} else {
+ * 			root = root.Left
+ * 		}
+ * 	}
+ * 	return root != nil
+ * }
+ */
+
 func countNodes(root *TreeNode) int {
 	if root == nil {
 		return 0
 	}
-	depth := 0
-	curr := root
-	for curr != nil {
-		curr = curr.Left
-		depth++
+	ld, rd := leftDepth(root.Left), leftDepth(root.Right)
+	if ld > rd {
+		return 1 + (1 << rd) - 1 + countNodes(root.Left)
+	} else {
+		return 1 + (1 << ld) - 1 + countNodes(root.Right)
 	}
-	left, right := (1 << (depth - 1)), (1<<depth)-1
-	for left < right {
-		mid := (left + right + 1) >> 1
-		if hasDepth(root, mid, depth) {
-			left = mid
-		} else {
-			right = mid - 1
-		}
-	}
-	return left
 }
 
-func hasDepth(root *TreeNode, k, depth int) bool {
-	for i := depth - 2; i >= 0; i-- {
-		if root == nil {
-			return false
-		}
-		if (k>>i)&1 != 0 {
-			root = root.Right
-		} else {
-			root = root.Left
-		}
+func leftDepth(root *TreeNode) int {
+	if root == nil {
+		return 0
 	}
-	return root != nil
+	return leftDepth(root.Left) + 1
 }

@@ -62,53 +62,92 @@
  * 进阶：你能设计一个在 o(n) 时间内解决此问题的算法吗？
  */
 
-var count [1 << 8]int
-var visit [1 << 8]bool
+/*
+ * var count [1 << 8]int
+ * var visit [1 << 8]bool
+ * 
+ * // 输入：s = "ADOBECODEBANC", t = "ABC"
+ * func minWindow(s string, t string) string {
+ * 	bs, bt := []byte(s), []byte(t)
+ * 	n := len(bs)
+ * 	for i := range count {
+ * 		count[i] = 0
+ * 		visit[i] = false
+ * 	}
+ * 	tot := 0
+ * 	for _, b := range bt {
+ * 		count[int(b)]++
+ * 		visit[int(b)] = true
+ * 		tot++
+ * 	}
+ * 	ans := []byte("")
+ * 	p, q := 0, 0
+ * 	for ; p < n; p++ {
+ * 		for ; q < n && tot > 0; q++ {
+ * 			index := int(bs[q])
+ * 			if !visit[index] {
+ * 				continue
+ * 			}
+ * 			// NOTE: 这里先更新欠债表: 如果更新后的欠债表仍不小于 0, 更新 tot.
+ * 			count[index]--
+ * 			if count[index] >= 0 {
+ * 				tot--
+ * 			}
+ * 		}
+ * 		if tot == 0 {
+ * 			cur := bs[p:q]
+ * 			if la, lc := len(ans), len(cur); la == 0 || la > lc {
+ * 				ans = make([]byte, lc)
+ * 				copy(ans, cur)
+ * 			}
+ * 		}
+ * 		// for ; p < n && tot == 0; p++ {
+ * 		index := int(bs[p])
+ * 		if visit[index] {
+ * 			// NOTE: 这里先更新 tot: 如果欠债表项不小于 0, 更新 tot.
+ * 			if count[index] >= 0 {
+ * 				tot++
+ * 			}
+ * 			count[index]++
+ * 		}
+ * 	}
+ * 	return string(ans)
+ * }
+ */
 
-// 输入：s = "ADOBECODEBANC", t = "ABC"
+// 滑动窗口. 谁跟你说这个题一定得枚举窗口起点了?
 func minWindow(s string, t string) string {
-	bs, bt := []byte(s), []byte(t)
-	n := len(bs)
-	for i := range count {
-		count[i] = 0
-		visit[i] = false
-	}
-	tot := 0
-	for _, b := range bt {
-		count[int(b)]++
-		visit[int(b)] = true
-		tot++
-	}
-	ans := []byte("")
-	p, q := 0, 0
-	for ; p < n; p++ {
-		for ; q < n && tot > 0; q++ {
-			index := int(bs[q])
-			if !visit[index] {
-				continue
-			}
-			// NOTE: 这里先更新欠债表: 如果更新后的欠债表仍不小于 0, 更新 tot.
-			count[index]--
-			if count[index] >= 0 {
-				tot--
-			}
-		}
-		if tot == 0 {
-			cur := bs[p:q]
-			if la, lc := len(ans), len(cur); la == 0 || la > lc {
-				ans = make([]byte, lc)
-				copy(ans, cur)
-			}
-		}
-		// for ; p < n && tot == 0; p++ {
-		index := int(bs[p])
-		if visit[index] {
-			// NOTE: 这里先更新 tot: 如果欠债表项不小于 0, 更新 tot.
-			if count[index] >= 0 {
-				tot++
-			}
-			count[index]++
-		}
-	}
-	return string(ans)
+    text, pattern := []byte(s), []byte(t)
+    n := len(text)
+    count := make([]int, 256)
+    for _, p := range pattern {
+        count[int(p)]++
+    }
+    p, q := 0, 0
+    ans := s + s
+    for ; q < n; q++ {
+        count[int(text[q])]--
+        if !cover(count) {
+            continue
+        }
+        for ; p <= q && cover(count); p++ {
+            if len(ans) > q - p + 1 {
+                ans = string(text[p : q+1])
+            }
+            count[int(text[p])]++
+        }
+    }
+    if len(ans) > n {
+        return ""
+    }
+    return ans
+}
+
+func cover(arr []int) bool {
+    for i := 0; i < 256; i++ {
+        if arr[i] > 0 {
+            return false
+        }
+    }
+    return true
 }

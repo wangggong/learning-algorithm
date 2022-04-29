@@ -126,3 +126,48 @@ func reverseWords(s string) string {
 	}
 	return string(ans)
 }
+
+/*
+ * // 老夫自己默出来啦!
+ * func reverseWords(s string) string {
+ * 	arr := []byte(s)
+ * 	n := len(arr)
+ * 	p, q := 0, 0
+ * 	for q < n {
+ * 		for q < n && arr[q] == ' ' {
+ * 			q++
+ * 		}
+ * 		for q < n && arr[q] != ' ' {
+ * 			arr[p] = arr[q]
+ * 			p++
+ * 			q++
+ * 		}
+ * 		if q < n && arr[q] == ' ' {
+ * 			arr[p] = ' '
+ * 			p++
+ * 		}
+ * 	}
+ * 	for p > 0 && arr[p-1] == ' ' {
+ * 		p--
+ * 	}
+ * 	arr = arr[:p]
+ * 	// fmt.Println(string(arr))
+ * 	n = len(arr)
+ * 	reverse(arr, 0, n-1)
+ * 	p, q = 0, 0
+ * 	for q < n {
+ * 		for q < n && arr[q] != ' ' {
+ * 			q++
+ * 		}
+ * 		reverse(arr, p, q-1)
+ * 		p, q = q+1, q+1
+ * 	}
+ * 	return string(arr)
+ * }
+ *
+ * func reverse(arr []byte, p, q int) {
+ * 	for ; p < q; p, q = p+1, q-1 {
+ * 		arr[p], arr[q] = arr[q], arr[p]
+ * 	}
+ * }
+ */

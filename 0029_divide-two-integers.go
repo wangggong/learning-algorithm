@@ -45,36 +45,76 @@
  *
  *
  */
+
+import "math"
+
+/*
+ * func divide(dividend int, divisor int) int {
+ * 	// assert divisor != 0;
+ * 	if dividend == 0 {
+ * 		return 0
+ * 	}
+ * 	if divisor == -(1 << 31) {
+ * 		if dividend == divisor {
+ * 			return 1
+ * 		}
+ * 		return 0
+ * 	}
+ * 	ans := 0
+ * 	flag := ((dividend > 0) && (divisor < 0)) || ((dividend < 0) && (divisor > 0))
+ * 	dividend, divisor = abs(dividend), abs(divisor)
+ * 	for c := dividend; c >= divisor; {
+ * 		k := 0
+ * 		for ; c > divisor << k; k++ {}
+ * 		if c == divisor << k {
+ * 			ans += 1 << k
+ * 			c -= divisor << k
+ * 		} else {
+ * 			ans += 1 << (k-1)
+ * 			c -= divisor << (k-1)
+ * 		}
+ * 	}
+ * 	if flag {
+ * 		return -ans
+ * 	}
+ * 	if ans > (1<<31)-1 {
+ * 		ans = (1 << 31) - 1
+ * 	}
+ * 	return ans
+ * }
+ */
+
+var powers []int
+
 func divide(dividend int, divisor int) int {
-	// assert divisor != 0;
 	if dividend == 0 {
 		return 0
 	}
-	if divisor == -(1 << 31) {
-		if dividend == divisor {
-			return 1
-		}
-		return 0
-	}
-	ans := 0
-	flag := ((dividend > 0) && (divisor < 0)) || ((dividend < 0) && (divisor > 0))
+	// assert divisor != 0;
+	neg := (dividend > 0) != (divisor > 0)
 	dividend, divisor = abs(dividend), abs(divisor)
-	for c := dividend; c >= divisor; {
-		k := 0
-		for ; c > divisor << k; k++ {}
-		if c == divisor << k {
-			ans += 1 << k
-			c -= divisor << k
-		} else {
-			ans += 1 << (k-1)
-			c -= divisor << (k-1)
+	powers = nil
+	for k := divisor; k <= dividend; {
+		powers = append(powers, k)
+		k += k
+	}
+	// fmt.Println(powers)
+	n := len(powers) - 1
+	ans := 0
+	for ; n >= 0; n-- {
+		if dividend >= powers[n] {
+			ans += 1 << n
+			dividend -= powers[n]
 		}
 	}
-	if flag {
-		return -ans
+	if neg {
+		ans = -ans
 	}
-	if ans > (1<<31)-1 {
-		ans = (1 << 31) - 1
+	if ans > math.MaxInt32 {
+		ans = math.MaxInt32
+	}
+	if ans < math.MinInt32 {
+		ans = math.MinInt32
 	}
 	return ans
 }

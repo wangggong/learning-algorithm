@@ -63,10 +63,8 @@
  */
 
 /*
- * var m map[*TreeNode][2]int
- *
+ * // 这个方案其实不加缓存也行...
  * func rob(root *TreeNode) int {
- * 	m = make(map[*TreeNode][2]int)
  * 	ans := traversal(root)
  * 	return max(ans[0], ans[1])
  * }
@@ -75,14 +73,12 @@
  * 	if root == nil {
  * 		return [2]int{0, 0}
  * 	}
- * 	if _, ok := m[root]; !ok {
- * 		left, right := traversal(root.Left), traversal(root.Right)
- * 		m[root] = [2]int{
- * 			root.Val + left[1] + right[1],
- * 			max(left[0], left[1]) + max(right[0], right[1]),
- * 		}
+ * 	left := traversal(root.Left)
+ * 	right := traversal(root.Right)
+ * 	return [2]int{
+ * 		root.Val + left[1] + right[1],
+ * 		max(left[0], left[1]) + max(right[0], right[1]),
  * 	}
- * 	return m[root]
  * }
  */
 
@@ -121,5 +117,3 @@ func max(x, y int) int {
 	}
 	return y
 }
-
-

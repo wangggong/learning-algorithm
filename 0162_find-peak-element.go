@@ -50,24 +50,64 @@
  *
  *
  */
-func findPeakElement(N []int) int {
-	n := len(N)
-	p, q := 0, n
-	for p < q {
-		m := (p + q) / 2
-		l := m == 0 || (m > 0 && N[m] > N[m-1])
-		r := m == n-1 || (m < n-1 && N[m] > N[m+1])
-		if l && r {
-			return m
+
+/*
+ * func findPeakElement(N []int) int {
+ * 	n := len(N)
+ * 	p, q := 0, n
+ * 	for p < q {
+ * 		m := (p + q) / 2
+ * 		l := m == 0 || (m > 0 && N[m] > N[m-1])
+ * 		r := m == n-1 || (m < n-1 && N[m] > N[m+1])
+ * 		if l && r {
+ * 			return m
+ * 		}
+ * 		if !l {
+ * 			q = m
+ * 			continue
+ * 		}
+ * 		if !r {
+ * 			p = m
+ * 			continue
+ * 		}
+ * 	}
+ * 	return p
+ * }
+ */
+
+func findPeakElement(nums []int) int {
+	n := len(nums)
+	// assert n > 0
+	l, r := 0, n-1
+	if check(nums, l) {
+		return l
+	}
+	if check(nums, r) {
+		return r
+	}
+	for l <= r {
+		mid := (l + r) >> 1
+		if check(nums, mid) {
+			return mid
 		}
-		if !l {
-			q = m
-			continue
-		}
-		if !r {
-			p = m
-			continue
+		if get(nums, mid-1) > get(nums, mid) {
+			r = mid - 1
+		} else {
+			l = mid + 1
 		}
 	}
-	return p
+	// unreachable
+	return -1
+}
+
+func check(arr []int, k int) bool {
+	return get(arr, k-1) < get(arr, k) && get(arr, k) > get(arr, k+1)
+}
+
+func get(arr []int, k int) int {
+	n := len(arr)
+	if k < 0 || k >= n {
+		return math.MinInt64
+	}
+	return arr[k]
 }

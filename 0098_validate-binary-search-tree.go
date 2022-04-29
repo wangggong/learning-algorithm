@@ -1,3 +1,5 @@
+import "math"
+
 /*
  * @lc app=leetcode.cn id=validate-binary-search-tree lang=golang
  *
@@ -76,19 +78,43 @@
  * }
  */
 
+/*
+ * func isValidBST(root *TreeNode) bool {
+ * 	return inorder(root, nil, nil)
+ * }
+ *
+ * func inorder(root, min, max *TreeNode) bool {
+ * 	if root == nil {
+ * 		return true
+ * 	}
+ * 	if min != nil && root.Val <= min.Val {
+ * 		return false
+ * 	}
+ * 	if max != nil && root.Val >= max.Val {
+ * 		return false
+ * 	}
+ * 	return inorder(root.Left, min, root) && inorder(root.Right, root, max)
+ * }
+ */
+
+// 发现了好俊的一发前序遍历!
+var preVal int
+
 func isValidBST(root *TreeNode) bool {
-	return inorder(root, nil, nil)
+	preVal = math.MinInt64
+	return preOrder(root)
 }
 
-func inorder(root, min, max *TreeNode) bool {
+func preOrder(root *TreeNode) bool {
 	if root == nil {
 		return true
 	}
-	if min != nil && root.Val <= min.Val {
+	if !preOrder(root.Left) {
 		return false
 	}
-	if max != nil && root.Val >= max.Val {
+	if root.Val <= preVal {
 		return false
 	}
-	return inorder(root.Left, min, root) && inorder(root.Right, root, max)
+	preVal = root.Val
+	return preOrder(root.Right)
 }

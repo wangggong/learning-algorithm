@@ -76,6 +76,7 @@ func nthSuperUglyNumber(k int, primes []int) int {
 				dp[i] = c
 			}
 		}
+		// 傻逼! 别忘了更新相同的数字! 每次循环要保证所有候选值严格大于当前最大值!
 		for j := 0; j < n; j++ {
 			if c := primes[j] * dp[indexes[j]]; c == dp[i] {
 				indexes[j]++
@@ -84,3 +85,5 @@ func nthSuperUglyNumber(k int, primes []int) int {
 	}
 	return dp[k-1]
 }
+
+// 二刷还不会, 继续丢人...

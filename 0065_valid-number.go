@@ -81,72 +81,204 @@
  *
  */
 
+/*
+ * func isNumber(s string) bool {
+ * 	bs := []byte(s)
+ * 	n := len(bs)
+ * 	if n == 0 {
+ * 		return false
+ * 	}
+ * 	for i, b := range bs {
+ * 		if b == 'e' || b == 'E' {
+ * 			if i+1 == n {
+ * 				return false
+ * 			}
+ * 			return validFloat(bs[:i]) && validInt(bs[i+1:], true)
+ * 		}
+ * 	}
+ * 	return validFloat(bs)
+ * }
+ *
+ * func validFloat(arr []byte) bool {
+ * 	if len(arr) == 0 {
+ * 		return false
+ * 	}
+ * 	ind, dot := 0, -1
+ * 	for i, b := range arr {
+ * 		if b == '.' {
+ * 			dot = i
+ * 			continue
+ * 		}
+ * 		if '0' <= b && b <= '9' {
+ * 			continue
+ * 		}
+ * 		if i == 0 && (b == '+' || b == '-') {
+ * 			ind++
+ * 			continue
+ * 		}
+ * 		return false
+ * 	}
+ * 	if dot >= 0 {
+ * 		intPart, floatPart := arr[ind:dot], arr[dot+1:]
+ * 		if len(intPart) == 0 {
+ * 			return validInt(floatPart, false)
+ * 		}
+ * 		if len(floatPart) == 0 {
+ * 			return validInt(intPart, false)
+ * 		}
+ * 		return validInt(intPart, false) && validInt(floatPart, false)
+ * 	}
+ * 	return validInt(arr, true)
+ * }
+ *
+ * func validInt(arr []byte, withSign bool) bool {
+ * 	if len(arr) == 0 {
+ * 		return false
+ * 	}
+ * 	hasSign := false
+ * 	for i, b := range arr {
+ * 		if i == 0 && (b == '+' || b == '-') && withSign {
+ * 			hasSign = true
+ * 			continue
+ * 		}
+ * 		if '0' <= b && b <= '9' {
+ * 			continue
+ * 		}
+ * 		return false
+ * 	}
+ * 	if hasSign && len(arr) == 1 {
+ * 		return false
+ * 	}
+ * 	return true
+ * }
+ */
+
+// DFA: 相比于梳理状态与状态转移, 写逻辑可简单多了.
+const (
+	StateInvalid = iota
+	StateStart
+	StateSign
+	StateInt
+	StatePointWithInt
+	StatePointWithoutInt
+	StateFloat
+	StateExp
+	StateExpSign
+	StateExpInt
+)
+
+const (
+	TokenInvalid = iota
+	TokenDigit
+	TokenSign
+	TokenPoint
+	TokenExp
+)
+
+var dfa = [][]int{
+	/* StateInvalid: */ {
+		/* TokenInvalid: */ StateInvalid,
+		/* TokenDigit: */ StateInvalid,
+		/* TokenSign: */ StateInvalid,
+		/* TokenPoint: */ StateInvalid,
+		/* TokenExp: */ StateInvalid,
+	},
+	/* StateStart: */ {
+		/* TokenInvalid: */ StateInvalid,
+		/* TokenDigit: */ StateInt,
+		/* TokenSign: */ StateSign,
+		/* TokenPoint: */ StatePointWithoutInt,
+		/* TokenExp: */ StateInvalid,
+	},
+	/* StateSign: */ {
+		/* TokenInvalid: */ StateInvalid,
+		/* TokenDigit: */ StateInt,
+		/* TokenSign: */ StateInvalid,
+		/* TokenPoint: */ StatePointWithoutInt,
+		/* TokenExp: */ StateInvalid,
+	},
+	/* StateInt: */ {
+		/* TokenInvalid: */ StateInvalid,
+		/* TokenDigit: */ StateInt,
+		/* TokenSign: */ StateInvalid,
+		/* TokenPoint: */ StatePointWithInt,
+		/* TokenExp: */ StateExp,
+	},
+	/* StatePointWithInt: */ {
+		/* TokenInvalid: */ StateInvalid,
+		/* TokenDigit: */ StateFloat,
+		/* TokenSign: */ StateInvalid,
+		/* TokenPoint: */ StateInvalid,
+		/* TokenExp: */ StateExp,
+	},
+	/* StatePointWithoutInt: */ {
+		/* TokenInvalid: */ StateInvalid,
+		/* TokenDigit: */ StateFloat,
+		/* TokenSign: */ StateInvalid,
+		/* TokenPoint: */ StateInvalid,
+		/* TokenExp: */ StateInvalid,
+	},
+	/* StateFloat: */ {
+		/* TokenInvalid: */ StateInvalid,
+		/* TokenDigit: */ StateFloat,
+		/* TokenSign: */ StateInvalid,
+		/* TokenPoint: */ StateInvalid,
+		/* TokenExp: */ StateExp,
+	},
+	/* StateExp: */ {
+		/* TokenInvalid: */ StateInvalid,
+		/* TokenDigit: */ StateExpInt,
+		/* TokenSign: */ StateExpSign,
+		/* TokenPoint: */ StateInvalid,
+		/* TokenExp: */ StateInvalid,
+	},
+	/* StateExpSign: */ {
+		/* TokenInvalid: */ StateInvalid,
+		/* TokenDigit: */ StateExpInt,
+		/* TokenSign: */ StateInvalid,
+		/* TokenPoint: */ StateInvalid,
+		/* TokenExp: */ StateInvalid,
+	},
+	/* StateExpInt: */ {
+		/* TokenInvalid: */ StateInvalid,
+		/* TokenDigit: */ StateExpInt,
+		/* TokenSign: */ StateInvalid,
+		/* TokenPoint: */ StateInvalid,
+		/* TokenExp: */ StateInvalid,
+	},
+}
+
 func isNumber(s string) bool {
-	bs := []byte(s)
-	n := len(bs)
-	if n == 0 {
-		return false
+	arr := []byte(s)
+	state := StateStart
+	for _, a := range arr {
+		state = dfa[state][tokenType(a)]
 	}
-	for i, b := range bs {
-		if b == 'e' || b == 'E' {
-			if i+1 == n {
-				return false
-			}
-			return validFloat(bs[:i]) && validInt(bs[i+1:], true)
-		}
-	}
-	return validFloat(bs)
+	return validState(state)
 }
 
-func validFloat(arr []byte) bool {
-	if len(arr) == 0 {
-		return false
+func tokenType(ch byte) int {
+	switch {
+	case '0' <= ch && ch <= '9':
+		return TokenDigit
+	case ch == '+' || ch == '-':
+		return TokenSign
+	case ch == '.':
+		return TokenPoint
+	case ch == 'e' || ch == 'E':
+		return TokenExp
+	default:
+		// do nothing
 	}
-	ind, dot := 0, -1
-	for i, b := range arr {
-		if b == '.' {
-			dot = i
-			continue
-		}
-		if '0' <= b && b <= '9' {
-			continue
-		}
-		if i == 0 && (b == '+' || b == '-') {
-			ind++
-			continue
-		}
-		return false
-	}
-	if dot >= 0 {
-		intPart, floatPart := arr[ind:dot], arr[dot+1:]
-		if len(intPart) == 0 {
-			return validInt(floatPart, false)
-		}
-		if len(floatPart) == 0 {
-			return validInt(intPart, false)
-		}
-		return validInt(intPart, false) && validInt(floatPart, false)
-	}
-	return validInt(arr, true)
+	return TokenInvalid
 }
 
-func validInt(arr []byte, withSign bool) bool {
-	if len(arr) == 0 {
-		return false
+func validState(s int) bool {
+	switch s {
+	case StateInt, StatePointWithInt, StateFloat, StateExpInt:
+		return true
+	default:
+		// do nothing
 	}
-	hasSign := false
-	for i, b := range arr {
-		if i == 0 && (b == '+' || b == '-') && withSign {
-			hasSign = true
-			continue
-		}
-		if '0' <= b && b <= '9' {
-			continue
-		}
-		return false
-	}
-	if hasSign && len(arr) == 1 {
-		return false
-	}
-	return true
+	return false
 }

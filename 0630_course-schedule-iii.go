@@ -68,9 +68,9 @@ type PriorityQueue struct {
 	Arr []int
 }
 
-func (pq PriorityQueue) Len() int           { return len(pq.Arr) }
-func (pq PriorityQueue) Less(p, q int) bool { return pq.Arr[p] > pq.Arr[q] }
-func (pq PriorityQueue) Swap(p, q int)      { pq.Arr[p], pq.Arr[q] = pq.Arr[q], pq.Arr[p] }
+func (pq PriorityQueue) Len() int            { return len(pq.Arr) }
+func (pq PriorityQueue) Less(p, q int) bool  { return pq.Arr[p] > pq.Arr[q] }
+func (pq PriorityQueue) Swap(p, q int)       { pq.Arr[p], pq.Arr[q] = pq.Arr[q], pq.Arr[p] }
 func (pq *PriorityQueue) Push(a interface{}) { pq.Arr = append(pq.Arr, a.(int)) }
 func (pq *PriorityQueue) Pop() interface{} {
 	l := len(pq.Arr)
@@ -94,3 +94,5 @@ func scheduleCourse(courses [][]int) int {
 	}
 	return pq.Len()
 }
+
+// 二刷还是没思路, 常看常新吧快...

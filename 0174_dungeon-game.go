@@ -1,5 +1,3 @@
-import "fmt"
-
 /*
  * @lc app=leetcode.cn id=dungeon-game lang=golang
  *
@@ -95,7 +93,7 @@ func calculateMinimumHP(G [][]int) int {
 			)
 		}
 	}
-	fmt.Println(dp)
+	// fmt.Println(dp)
 	return dp[0][0]
 }
 

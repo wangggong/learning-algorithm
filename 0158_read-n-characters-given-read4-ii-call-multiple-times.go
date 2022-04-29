@@ -120,3 +120,31 @@ var readn = func(read4 func([]byte) int) func([]byte, int) int {
 }
 
 var solution = readn
+
+/*
+ * var solution = func(read4 func([]byte) int) func([]byte, int) int {
+ *     // implement read below.
+ *     var buffer []byte
+ *     return func(buf []byte, n int) int {
+ *         for len(buffer) < n {
+ *             tmp := make([]byte, 4)
+ *             v := read4(tmp)
+ *             buffer = append(buffer, tmp[:v]...)
+ *             if v < 4 {
+ *                 break
+ *             }
+ *         }
+ *         k := min(n, len(buffer))
+ *         copy(buf, buffer[:k])
+ *         buffer = buffer[k:]
+ *         return k
+ *     }
+ * }
+ *
+ * func min(x, y int) int {
+ *     if x < y {
+ *         return x
+ *     }
+ *     return y
+ * }
+ */

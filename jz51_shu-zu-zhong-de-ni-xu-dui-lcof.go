@@ -1,5 +1,3 @@
-import "sort"
-
 /*
  * Hard
  *
@@ -22,49 +20,102 @@ import "sort"
  *
  */
 
-func lowBit(x int) int { return x & (-x) }
-
-type BIT struct {
-	Arr []int
-}
-
-func (b BIT) query(index int) int {
-	ans := 0
-	for ; index > 0; index -= lowBit(index) {
-		ans += b.Arr[index]
-	}
-	return ans
-}
-
-func (b BIT) add(index int, val int) {
-	for ind := index; ind < len(b.Arr); ind += lowBit(ind) {
-		b.Arr[ind] += val
-	}
-}
+/*
+ * import "sort"
+ *
+ * func lowBit(x int) int { return x & (-x) }
+ *
+ * type BIT []int
+ *
+ * func (b BIT) query(x int) int {
+ * 	ans := 0
+ * 	for ; x > 0; x -= lowBit(x) {
+ * 		ans += b[x]
+ * 	}
+ * 	return ans
+ * }
+ *
+ * func (b *BIT) add(x, v int) {
+ * 	n := len(*b) - 1
+ * 	for ; x <= n; x += lowBit(x) {
+ * 		(*b)[x] += v
+ * 	}
+ * 	return
+ * }
+ *
+ * func NewBIT(n int) *BIT {
+ * 	arr := make([]int, n+1)
+ * 	b := BIT(arr)
+ * 	return &b
+ * }
+ *
+ * // 树状数组, 有意思的解法
+ * func reversePairs(nums []int) int {
+ * 	n := len(nums)
+ * 	m := make(map[int]int)
+ * 	arr := make([]int, n)
+ * 	copy(arr, nums)
+ * 	sort.Ints(arr)
+ * 	for i, a := range arr {
+ * 		m[a] = i + 1
+ * 	}
+ * 	b := NewBIT(n)
+ * 	ans := 0
+ * 	for _, num := range nums {
+ * 		k := m[num]
+ * 		// 正着遍历的话需要避免把取等的情况算进去, 所以别写成这样:
+ * 		//
+ * 		// ans += b.query(n) - b.query(k-1)  // or ans += b.between(k, n)
+ * 		//
+ * 		// 上面算的都是 `[k,n]` 闭区间的前缀和, 也就是 "在当前数字前 >= k 的数字的总个数".
+ * 		ans += b.query(n) - b.query(k)
+ * 		b.add(k, 1)
+ * 	}
+ * 	return ans
+ * }
+ */
 
 func reversePairs(nums []int) int {
 	n := len(nums)
-	m := make(map[int]int)
-	var vals []int
-	for _, v := range nums {
-		if _, ok := m[v]; ok {
-			continue
+	return merge(nums, 0, n)
+}
+
+// 剑指 offer 原题解, 基于 mergeSort 实现.
+func merge(arr []int, l, r int) int {
+	if l+1 >= r {
+		return 0
+	}
+	mid := (l + r) >> 1
+	left := merge(arr, l, mid)
+	right := merge(arr, mid, r)
+	cpy := make([]int, r-l)
+	p, q := mid-1, r-1
+	k := r - l - 1
+	cnt := 0
+	for p >= l && q >= mid {
+		// 这里同样要注意避免对取等计数, 所以是 `<=` 而不是 `<`.
+		if arr[p] <= arr[q] {
+			cpy[k] = arr[q]
+			k--
+			q--
+		} else {
+			cpy[k] = arr[p]
+			cnt += q - mid + 1
+			k--
+			p--
 		}
-		m[v] = 0
-		vals = append(vals, v)
 	}
-	sort.Ints(vals)
-	for i, v := range vals {
-		m[v] = i
+	for p >= l {
+		cpy[k] = arr[p]
+		cnt += q - mid + 1
+		k--
+		p--
 	}
-	for i := 0; i < n; i++ {
-		nums[i] = m[nums[i]] + 1
+	for q >= mid {
+		cpy[k] = arr[q]
+		k--
+		q--
 	}
-	tr := BIT{Arr: make([]int, n)}
-	ans := 0
-	for i := n - 1; i >= 0; i-- {
-		ans += tr.query(nums[i] - 1)
-		tr.add(nums[i], 1)
-	}
-	return ans
+	copy(arr[l:r], cpy)
+	return left + right + cnt
 }

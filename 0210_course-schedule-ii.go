@@ -61,112 +61,98 @@
  *
  */
 
-const MAXN = 2000 + 10
+var G [][]int
+var ans []int
+var visit []bool
 
-var visit [MAXN]bool
-var curr [MAXN]bool
-var S, Q, ans []int
-var G [MAXN][]int
-var indegree [MAXN]int
-var valid bool
-
-/*
- * // DFS
- * func findOrder(n int, prerequisites [][]int) []int {
- * 	for i := 0; i < MAXN; i++ {
- * 		visit[i] = false
- * 		curr[i] = false
- * 		G[i] = nil
- * 	}
- * 	S = nil
- * 	valid = true
- * 	for _, p := range prerequisites {
- * 		G[p[0]] = append(G[p[0]], p[1])
- * 	}
- * 	for i := 0; i < n; i++ {
- * 		if visit[i] {
- * 			continue
- * 		}
- * 		hasRing(i)
- * 		if !valid {
- * 			return S
- * 		}
- * 	}
- * 	for i := range visit {
- * 		visit[i] = false
- * 	}
- * 	for i := 0; i < n; i++ {
- * 			topoSort(i)
- * 	}
- * 	// reverse(S)
- * 	return S
- * }
- */
-
-func hasRing(k int) {
-	if !valid {
-		return
+func findOrder(n int, P [][]int) []int {
+	G = make([][]int, n)
+	visit = make([]bool, n)
+	ans = nil
+	for _, p := range P {
+		G[p[1]] = append(G[p[1]], p[0])
 	}
-	visit[k] = true
-	curr[k] = true
-	for _, v := range G[k] {
-		if curr[v] {
-			valid = false
-			return
+	for i := 0; i < n; i++ {
+		if hasRing(i) {
+			return ans
 		}
-		hasRing(v)
 	}
-	curr[k] = false
+	for i := 0; i < n; i++ {
+		dfs(i)
+	}
+	for i, j := 0, len(ans)-1; i < j; i, j = i+1, j-1 {
+		ans[i], ans[j] = ans[j], ans[i]
+	}
+	return ans
 }
 
-func topoSort(k int) {
+func hasRing(k int) bool {
+	if visit[k] {
+		return false
+	}
+	visit[k] = true
+	for _, g := range G[k] {
+		if visit[g] || hasRing(g) {
+			return true
+		}
+	}
+	visit[k] = false
+	return false
+}
+
+func dfs(k int) {
 	if visit[k] {
 		return
 	}
 	visit[k] = true
-	for _, v := range G[k] {
-		topoSort(v)
+	for _, g := range G[k] {
+		dfs(g)
 	}
-	S = append(S, k)
+	ans = append(ans, k)
+	return
 }
 
-func reverse(arr []int) {
-	for i, j := 0, len(arr)-1; i < j; i, j = i+1, j-1 {
-		arr[i], arr[j] = arr[j], arr[i]
-	}
-}
-
-// BFS
-func findOrder(n int, prerequisites [][]int) []int {
-	ans, Q = nil, nil
-	for i := 0; i < MAXN; i++ {
-		G[i] = nil
-		indegree[i] = 0
-	}
-	for _, p := range prerequisites {
-		G[p[0]] = append(G[p[0]], p[1])
-		indegree[p[1]]++
-	}
-	for i := 0; i < n; i++ {
-		if indegree[i] > 0 {
-			continue
-		}
-		Q = append(Q, i)
-	}
-	for len(Q) > 0 {
-		q := Q[0]
-		Q = Q[1:]
-		ans = append(ans, q)
-		for _, v := range G[q] {
-			indegree[v]--
-			if indegree[v] == 0 {
-				Q = append(Q, v)
-			}
-		}
-	}
-	reverse(ans)
-	if len(ans) < n {
-		ans = ans[:0]
-	}
-	return ans
-}
+/*
+ * // BFS
+ * const MAXN = 2000 + 10
+ *
+ * var visit [MAXN]bool
+ * var S, Q, ans []int
+ * var G [MAXN][]int
+ * var indegree [MAXN]int
+ * var valid bool
+ *
+ * func findOrder(n int, prerequisites [][]int) []int {
+ * 	ans, Q = nil, nil
+ * 	for i := 0; i < MAXN; i++ {
+ * 		G[i] = nil
+ * 		indegree[i] = 0
+ * 	}
+ * 	for _, p := range prerequisites {
+ * 		G[p[0]] = append(G[p[0]], p[1])
+ * 		indegree[p[1]]++
+ * 	}
+ * 	for i := 0; i < n; i++ {
+ * 		if indegree[i] > 0 {
+ * 			continue
+ * 		}
+ * 		Q = append(Q, i)
+ * 	}
+ * 	for len(Q) > 0 {
+ * 		q := Q[0]
+ * 		Q = Q[1:]
+ * 		ans = append(ans, q)
+ * 		for _, v := range G[q] {
+ * 			indegree[v]--
+ * 			if indegree[v] == 0 {
+ * 				Q = append(Q, v)
+ * 			}
+ * 		}
+ * 	}
+ * 	reverse(ans)
+ * 	if len(ans) < n {
+ * 		ans = ans[:0]
+ * 	}
+ * 	return ans
+ * }
+ */
