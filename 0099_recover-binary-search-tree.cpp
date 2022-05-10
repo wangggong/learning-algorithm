@@ -58,12 +58,25 @@
  * };
  */
 class Solution {
+    TreeNode *node1, *node2, *prev;
+
 public:
     void inorder(TreeNode* r, vector<int>& N) {
         if (r == nullptr) return;
         inorder(r->left, N);
         N.push_back(r->val);
         inorder(r->right, N);
+    }
+
+    void inorder(TreeNode* root) {
+        if (root == nullptr) return;
+        inorder(root->left);
+        if (prev != nullptr && prev->val > root->val) {
+            if (node1 == nullptr) node1 = prev, node2 = root;
+            else node2 = root;
+        }
+        prev = root;
+        inorder(root->right);
     }
 
     pair<int, int> findUnsorted(vector<int> N) {
@@ -97,10 +110,21 @@ public:
         recover(r->right, n, p, q);
     }
 
+    /*
+     * void recoverTree(TreeNode* r) {
+     *     vector<int> N;
+     *     inorder(r, N);
+     *     auto p = findUnsorted(N);
+     *     recover(r, 2, p.first, p.second);
+     * }
+     */
+
+    // 参考: https://leetcode-cn.com/problems/recover-binary-search-tree/solution/tu-jie-hui-fu-yi-ge-er-cha-sou-suo-shu-by-hyj8/
+    // 
+    // 二刷没思路系列. 实际上直接找不满足条件的两对节点就好; 当然有可能是一对.
     void recoverTree(TreeNode* r) {
-        vector<int> N;
-        inorder(r, N);
-        auto p = findUnsorted(N);
-        recover(r, 2, p.first, p.second);
+        inorder(r);
+        swap(node1->val, node2->val);
+        return;
     }
 };

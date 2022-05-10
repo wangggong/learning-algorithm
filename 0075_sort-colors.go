@@ -62,20 +62,37 @@
 func sortColors(nums []int) {
 	// 3-way partition
 	n := len(nums)
+	// `i`, `j`, `k` 指向 `0` 的终点, `1` 的起点, `2` 的起点.
 	i, j, k := 0, 0, n-1
+	/*
+	 * for j <= k {
+	 * 	switch c := nums[j] - 1; {
+	 * 	case c > 0:
+	 * 		nums[j], nums[k] = nums[k], nums[j]
+	 * 		k--
+	 * 	case c < 0:
+	 * 		nums[j], nums[i] = nums[i], nums[j]
+	 * 		i++
+	 * 		fallthrough
+	 * 	case c == 0:
+	 * 		j++
+	 * 	default:
+	 * 		// unreachable
+	 * 	}
+	 * }
+	 */
+
+	// 说人话:
 	for j <= k {
-		switch c := nums[j] - 1; {
-		case c > 0:
+		if nums[j] == 0 {
+			nums[i], nums[j] = nums[j], nums[i]
+			i++
+			j++
+		} else if nums[j] == 2 {
 			nums[j], nums[k] = nums[k], nums[j]
 			k--
-		case c < 0:
-			nums[j], nums[i] = nums[i], nums[j]
-			i++
-			fallthrough
-		case c == 0:
+		} else {
 			j++
-		default:
-			// unreachable
 		}
 	}
 	return

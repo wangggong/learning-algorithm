@@ -104,6 +104,8 @@
  * }
  */
 
+// 二刷不会了, 可怕...
+//
 // 空间 `O(1)` 的做法, 参考剑指offer.
 func copyRandomList(head *Node) *Node {
 	if head == nil {

@@ -58,30 +58,44 @@
  * 
  */
 class Solution {
-  int f(int n, bool dir) {
-    int v = 0;
-    if (n == 1) {
-      v = 1;
-      // cout << n << " " << dir << " " << v << endl;
-      return v;
+    int remainingLeft(int n) {
+        return n <= 1 ? n : remainingRight(n >> 1) << 1;
     }
-    if (dir) {
-      v = f(n >> 1, !dir) << 1;
-      // cout << n << " " << dir << " " << v << endl;
-      return v;
+
+    int remainingRight(int n) {
+        return n + 1 - remainingLeft(n);
     }
-    if (n & 1) {
-      v = f(n >> 1, !dir) << 1;
-      // cout << n << " " << dir << " " << v << endl;
-      return v;
+
+    int f(int n, bool dir) {
+        int v = 0;
+        if (n == 1) {
+            v = 1;
+            // cout << n << " " << dir << " " << v << endl;
+            return v;
+        }
+        if (dir) {
+            v = f(n >> 1, !dir) << 1;
+            // cout << n << " " << dir << " " << v << endl;
+            return v;
+        }
+        if (n & 1) {
+            v = f(n >> 1, !dir) << 1;
+            // cout << n << " " << dir << " " << v << endl;
+            return v;
+        }
+        v = ((f((n >> 1), !dir) - 1) << 1) | 1;
+        // cout << n << " " << dir << " " << v << endl;
+        return v;
     }
-    v = ((f((n >> 1), !dir) - 1) << 1) | 1;
-    // cout << n << " " << dir << " " << v << endl;
-    return v;
-  }
 public:
-  int lastRemaining(int n) {
-    // return f(n, true);
-    return n == 1 ? 1 : 2 * (((n >> 1) + 1) - lastRemaining(n >> 1));
-  }
+    /*
+     * int lastRemaining(int n) {
+     *     // return f(n, true);
+     *     return n == 1 ? 1 : 2 * (((n >> 1) + 1) - lastRemaining(n >> 1));
+     * }
+     */
+
+    int lastRemaining(int n) {
+        return remainingLeft(n);
+    }
 };
