@@ -48,29 +48,53 @@
 
 var count map[int]int
 
+/*
+ * func topKFrequent(nums []int, k int) []int {
+ * 	count = make(map[int]int)
+ * 	for _, n := range nums {
+ * 		count[n]++
+ * 	}
+ * 	var candidates []int
+ * 	for k := range count {
+ * 		candidates = append(candidates, k)
+ * 	}
+ * 	n := len(candidates)
+ * 	p, q := 0, n-1
+ * 	for p < q {
+ * 		ind := partition(candidates, p, q)
+ * 		// fmt.Printf("%v %v %v %v\n", candidates, p, q, ind)
+ * 		if ind == n-k {
+ * 			break
+ * 		} else if ind > n-k {
+ * 			q = ind - 1
+ * 		} else {
+ * 			p = ind + 1
+ * 		}
+ * 	}
+ * 	return candidates[n-k:]
+ * }
+ */
+
+// 桶排序.
 func topKFrequent(nums []int, k int) []int {
-	count = make(map[int]int)
+	count := make(map[int]int)
 	for _, n := range nums {
 		count[n]++
 	}
-	var candidates []int
-	for k := range count {
-		candidates = append(candidates, k)
+	n := len(nums)
+	buckets := make([][]int, n+1)
+	for k, v := range count {
+		buckets[v] = append(buckets[v], k)
 	}
-	n := len(candidates)
-	p, q := 0, n-1
-	for p < q {
-		ind := partition(candidates, p, q)
-		// fmt.Printf("%v %v %v %v\n", candidates, p, q, ind)
-		if ind == n-k {
-			break
-		} else if ind > n-k {
-			q = ind - 1
-		} else {
-			p = ind + 1
+	var ans []int
+	for i := n; i > 0; i-- {
+		for _, b := range buckets[i] {
+			if len(ans) < k {
+				ans = append(ans, b)
+			}
 		}
 	}
-	return candidates[n-k:]
+	return ans
 }
 
 func partition(arr []int, p, q int) int {

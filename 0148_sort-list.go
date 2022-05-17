@@ -64,6 +64,9 @@
  */
 
 // mergeSort
+//
+// 5.16 后记: 你觉得为什么 `sortList` 要返回 `*ListNode` 结构呢? 如果不返回怎么样? 需要怎么处理?
+// 提示: Golang 中 `head` 作为参数传入的是 **指针值**.
 func sortList(head *ListNode) *ListNode {
 	if head == nil || head.Next == nil {
 		return head

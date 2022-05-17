@@ -92,6 +92,8 @@ func max(x, y int) int {
 }
 
 // 滑动窗口
+//
+// 二刷无印象+1
 func findLength(nums1 []int, nums2 []int) int {
 	n, m = len(nums1), len(nums2)
 	ans := 0

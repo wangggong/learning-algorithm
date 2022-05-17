@@ -45,45 +45,78 @@
  *
  */
 
-var count [1 << 8]int
-var visit [1 << 8]bool
+/*
+ * var count [1 << 8]int
+ * var visit [1 << 8]bool
+ *
+ * func checkInclusion(s1 string, s2 string) bool {
+ * 	bs1, bs2 := []byte(s1), []byte(s2)
+ * 	n := len(bs2)
+ * 	for i := range count {
+ * 		count[i] = 0
+ * 		visit[i] = false
+ * 	}
+ * 	tot := 0
+ * 	for _, b := range bs1 {
+ * 		count[int(b)]++
+ * 		visit[int(b)] = true
+ * 		tot++
+ * 	}
+ * 	for p, q := 0, 0; p < n; p++ {
+ * 		for ; q < n && tot > 0; q++ {
+ * 			index := int(bs2[q])
+ * 			if visit[index] {
+ * 				tot--
+ * 			}
+ * 			count[index]--
+ * 		}
+ * 		allZero := true
+ * 		for _, c := range count {
+ * 			if c != 0 {
+ * 				allZero = false
+ * 				break
+ * 			}
+ * 		}
+ * 		if allZero {
+ * 			return true
+ * 		}
+ * 		index := int(bs2[p])
+ * 		if visit[index] {
+ * 			tot++
+ * 		}
+ * 		count[index]++
+ * 	}
+ * 	return false
+ * }
+ */
+
+// 重新审视, 闭区间滑动窗口写这么复杂真是醉了...
+const alphaCnt int = 26
 
 func checkInclusion(s1 string, s2 string) bool {
-	bs1, bs2 := []byte(s1), []byte(s2)
-	n := len(bs2)
-	for i := range count {
-		count[i] = 0
-		visit[i] = false
+	var count [alphaCnt]int
+	for _, s := range s1 {
+		count[int(s-'a')]++
 	}
-	tot := 0
-	for _, b := range bs1 {
-		count[int(b)]++
-		visit[int(b)] = true
-		tot++
-	}
-	for p, q := 0, 0; p < n; p++ {
-		for ; q < n && tot > 0; q++ {
-			index := int(bs2[q])
-			if visit[index] {
-				tot--
-			}
-			count[index]--
+	for p, q, n, m := 0, 0, len(s2), len(s1); q < n; q++ {
+		count[int(s2[q]-'a')]--
+		if q-p+1 < m {
+			continue
 		}
-		allZero := true
-		for _, c := range count {
-			if c != 0 {
-				allZero = false
-				break
-			}
-		}
-		if allZero {
+		if check(count[:]) {
 			return true
 		}
-		index := int(bs2[p])
-		if visit[index] {
-			tot++
-		}
-		count[index]++
+		count[int(s2[p]-'a')]++
+		p++
 	}
 	return false
+}
+
+func check(count []int) bool {
+	for _, c := range count {
+		if c != 0 {
+			return false
+		}
+	}
+	return true
 }
