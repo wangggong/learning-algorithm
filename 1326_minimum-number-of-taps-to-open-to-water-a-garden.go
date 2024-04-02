@@ -132,30 +132,23 @@
 // 参考: https://leetcode-cn.com/problems/minimum-number-of-taps-to-open-to-water-a-garden/solution/guan-gai-hua-yuan-de-zui-shao-shui-long-tou-shu-3/
 //
 // 就是跳跃游戏套了个壳子嘛, 傻逼了吧...
+// @20230221 更新, 二刷不会系列.
 func minTaps(n int, ranges []int) int {
-	// assert n > 0;
 	right := make([]int, n+1)
 	right[0] = ranges[0]
 	for i := 1; i <= n; i++ {
 		l, r := max(i-ranges[i], 0), min(i+ranges[i], n)
+		right[i] = max(right[i-1], r)
 		right[l] = max(right[l], r)
 	}
-	curr := 0
-	ans := 0
-	i := 0
-	for curr < n {
-		next := curr
-		for ; i <= curr; i++ {
+	ans := 1
+	for i, curr, next := 0, right[0], 0; curr < n; curr, ans = next, ans+1 {
+		for next = curr; i <= curr; i++ {
 			next = max(next, right[i])
 		}
 		if curr == next {
 			return -1
 		}
-		curr = next
-		ans++
-	}
-	if curr < n {
-		return -1
 	}
 	return ans
 }

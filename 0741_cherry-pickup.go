@@ -63,21 +63,63 @@ var dp [maxn + 10][maxn + 10][maxn + 10]int
 var visit [maxn + 10][maxn + 10][maxn + 10]bool
 var n, m int
 
+/*
+ * func cherryPickup(G [][]int) int {
+ * 	n, m = len(G), len(G[0])
+ * 	for i := 0; i < maxn+10; i++ {
+ * 		for j := 0; j < maxn+10; j++ {
+ * 			for k := 0; k < maxn+10; k++ {
+ * 				dp[i][j][k] = math.MinInt32
+ * 				visit[i][j][k] = false
+ * 			}
+ * 		}
+ * 	}
+ * 	ans := dfs(G, 0, 0, 0)
+ * 	if ans < 0 {
+ * 		return 0
+ * 	}
+ * 	return ans
+ * }
+ */
+
 func cherryPickup(G [][]int) int {
-	n, m = len(G), len(G[0])
-	for i := 0; i < maxn+10; i++ {
-		for j := 0; j < maxn+10; j++ {
-			for k := 0; k < maxn+10; k++ {
-				dp[i][j][k] = math.MinInt32
-				visit[i][j][k] = false
+	n := len(G)
+	dp := make([][][]int, 2*n-1)
+	for k := range dp {
+		dp[k] = make([][]int, n+1)
+		for x1 := range dp[k] {
+			dp[k][x1] = make([]int, n+1)
+		}
+	}
+	for k := range dp {
+		for x1 := range dp[k] {
+			for x2 := range dp[k][x1] {
+				dp[k][x1][x2] = math.MinInt32
 			}
 		}
 	}
-	ans := dfs(G, 0, 0, 0)
-	if ans < 0 {
-		return 0
+	dp[0][1][1] = G[0][0]
+	for k := 1; k <= 2*(n-1); k++ {
+		for x1 := 0; x1 <= k; x1++ {
+			if x1 >= n || k-x1 >= n || G[x1][k-x1] == -1 {
+				continue
+			}
+			for x2 := 0; x2 <= k; x2++ {
+				if x2 >= n || k-x2 >= n || G[x2][k-x2] == -1 {
+					continue
+				}
+				c := G[x1][k-x1]
+				if x1 != x2 {
+					c += G[x2][k-x2]
+				}
+				dp[k][x1+1][x2+1] = max(
+					max(dp[k-1][x1][x2], dp[k-1][x1+1][x2+1]),
+					max(dp[k-1][x1+1][x2], dp[k-1][x1][x2+1]),
+				) + c
+			}
+		}
 	}
-	return ans
+	return max(dp[2*(n-1)][n][n], 0)
 }
 
 func dfs(G [][]int, x1, y, x2 int) int {

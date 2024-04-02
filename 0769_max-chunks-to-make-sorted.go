@@ -53,19 +53,39 @@
  *
  *
  */
-func maxChunksToSorted(arr []int) int {
-	n := len(arr)
-	p := 0
-	ans := 0
-	for p < n {
-		mx := arr[p]
-		for i := p; i < n && i <= mx; i++ {
-			mx = max(mx, arr[i])
+
+/*
+ * func maxChunksToSorted(arr []int) int {
+ * 	n := len(arr)
+ * 	p := 0
+ * 	ans := 0
+ * 	for p < n {
+ * 		mx := arr[p]
+ * 		for i := p; i < n && i <= mx; i++ {
+ * 			mx = max(mx, arr[i])
+ * 		}
+ * 		p = mx + 1
+ * 		ans++
+ * 	}
+ * 	return ans
+ * }
+ *
+ * func max(x, y int) int {
+ * 	if x > y {
+ * 		return x
+ * 	}
+ * 	return y
+ * }
+ */
+
+func maxChunksToSorted(arr []int) (ans int) {
+	for cur, n := 0, len(arr); cur < n; {
+		for mx := arr[cur]; cur <= mx; cur++ {
+			mx = max(mx, arr[cur])
 		}
-		p = mx + 1
 		ans++
 	}
-	return ans
+	return
 }
 
 func max(x, y int) int {

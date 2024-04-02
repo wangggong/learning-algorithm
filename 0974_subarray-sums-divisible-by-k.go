@@ -48,18 +48,34 @@
  *
  *
  */
+
+/*
+ * func subarraysDivByK(nums []int, k int) int {
+ * 	n := len(nums)
+ * 	preSum := make([]int, n+1)
+ * 	for i, n := range nums {
+ * 		preSum[i+1] = preSum[i] + ((n%k)+k)%k
+ * 	}
+ * 	ans := 0
+ * 	cnt := make([]int, k)
+ * 	cnt[0] = 1
+ * 	for i := 1; i <= n; i++ {
+ * 		ans += cnt[preSum[i]%k]
+ * 		cnt[preSum[i]%k]++
+ * 	}
+ * 	return ans
+ * }
+ */
+
 func subarraysDivByK(nums []int, k int) int {
-	n := len(nums)
-	preSum := make([]int, n+1)
-	for i, n := range nums {
-		preSum[i+1] = preSum[i] + ((n%k)+k)%k
-	}
-	ans := 0
-	cnt := make([]int, k)
-	cnt[0] = 1
-	for i := 1; i <= n; i++ {
-		ans += cnt[preSum[i]%k]
-		cnt[preSum[i]%k]++
+	ans, cur := 0, 0
+	memo := make([]int, k)
+	memo[0]++
+	for _, n := range nums {
+		cur += n
+		m := ((cur % k) + k) % k
+		ans += memo[m]
+		memo[m]++
 	}
 	return ans
 }

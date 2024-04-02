@@ -85,29 +85,50 @@
  * }
  */
 
-var node *ListNode
+/*
+ * var node *ListNode
+ *
+ * func sortedListToBST(head *ListNode) *TreeNode {
+ * 	size := 0
+ * 	for curr := head; curr != nil; curr = curr.Next {
+ * 		size++
+ * 	}
+ * 	node = head
+ * 	return inorder(0, size)
+ * }
+ *
+ * func inorder(l, r int) *TreeNode {
+ * 	if l >= r {
+ * 		return nil
+ * 	}
+ * 	mid := (l + r) >> 1
+ * 	left := inorder(l, mid)
+ * 	val := node.Val
+ * 	node = node.Next
+ * 	right := inorder(mid+1, r)
+ * 	return &TreeNode{
+ * 		Val:   val,
+ * 		Left:  left,
+ * 		Right: right,
+ * 	}
+ * }
+ */
 
 func sortedListToBST(head *ListNode) *TreeNode {
-	size := 0
-	for curr := head; curr != nil; curr = curr.Next {
-		size++
-	}
-	node = head
-	return inorder(0, size)
+	return buildTree(head, nil)
 }
 
-func inorder(l, r int) *TreeNode {
-	if l >= r {
+func buildTree(head, tail *ListNode) *TreeNode {
+	if head == tail {
 		return nil
 	}
-	mid := (l + r) >> 1
-	left := inorder(l, mid)
-	val := node.Val
-	node = node.Next
-	right := inorder(mid+1, r)
+	p, q := head, head.Next
+	for q != tail && q.Next != tail {
+		p, q = p.Next, q.Next.Next
+	}
 	return &TreeNode{
-		Val:   val,
-		Left:  left,
-		Right: right,
+		Val:   p.Val,
+		Left:  buildTree(head, p),
+		Right: buildTree(p.Next, tail),
 	}
 }

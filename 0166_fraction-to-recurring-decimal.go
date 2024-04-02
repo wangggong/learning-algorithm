@@ -54,59 +54,99 @@
  *
  *
  */
-func fractionToDecimal(num int, den int) string {
-	if num == 0 {
-		return "0"
-	}
-	// assert den != 0
-	neg := (num > 0) != (den > 0)
-	num, den = abs(num), abs(den)
-	intPart := num / den
-	intStr := strconv.Itoa(intPart)
-	if neg {
-		intStr = "-" + intStr
-	}
-	num %= den
-	if num == 0 {
-		return intStr
-	}
-	floatStr := ""
-	memo := make(map[int]string)
-	for num > 0 {
-		if _, ok := memo[num]; ok {
-			loop := findLoop(num, den, memo)
-			floatStr = floatStr[:len(floatStr)-len(loop)] + "(" + loop + ")"
-			break
-		}
-		cur := ""
-		newNum := num * 10
-		for newNum < den {
-			newNum *= 10
-			cur = cur + "0"
-		}
-		cur = cur + strconv.Itoa(newNum/den)
-		floatStr += cur
-		memo[num] = cur
-		num = newNum % den
-		// fmt.Println(memo, cur, num, newNum)
-	}
-	return intStr + "." + floatStr
-}
 
-func findLoop(num, den int, memo map[int]string) string {
-	next := func(num, den int) int {
-		for ; num < den; num *= 10 {
-		}
-		ans := num % den
-		return ans
+/*
+ * func fractionToDecimal(num int, den int) string {
+ * 	if num == 0 {
+ * 		return "0"
+ * 	}
+ * 	// assert den != 0
+ * 	neg := (num > 0) != (den > 0)
+ * 	num, den = abs(num), abs(den)
+ * 	intPart := num / den
+ * 	intStr := strconv.Itoa(intPart)
+ * 	if neg {
+ * 		intStr = "-" + intStr
+ * 	}
+ * 	num %= den
+ * 	if num == 0 {
+ * 		return intStr
+ * 	}
+ * 	floatStr := ""
+ * 	memo := make(map[int]string)
+ * 	for num > 0 {
+ * 		if _, ok := memo[num]; ok {
+ * 			loop := findLoop(num, den, memo)
+ * 			floatStr = floatStr[:len(floatStr)-len(loop)] + "(" + loop + ")"
+ * 			break
+ * 		}
+ * 		cur := ""
+ * 		newNum := num * 10
+ * 		for newNum < den {
+ * 			newNum *= 10
+ * 			cur = cur + "0"
+ * 		}
+ * 		cur = cur + strconv.Itoa(newNum/den)
+ * 		floatStr += cur
+ * 		memo[num] = cur
+ * 		num = newNum % den
+ * 		// fmt.Println(memo, cur, num, newNum)
+ * 	}
+ * 	return intStr + "." + floatStr
+ * }
+ *
+ * func findLoop(num, den int, memo map[int]string) string {
+ * 	next := func(num, den int) int {
+ * 		for ; num < den; num *= 10 {
+ * 		}
+ * 		ans := num % den
+ * 		return ans
+ * 	}
+ * 	ans := memo[num]
+ * 	for cur := next(num, den); cur != num; cur = next(cur, den) {
+ * 		if cur != num {
+ * 			ans = ans + memo[cur]
+ * 		}
+ * 	}
+ * 	return ans
+ * }
+ *
+ * func abs(x int) int {
+ * 	if x >= 0 {
+ * 		return x
+ * 	}
+ * 	return -x
+ * }
+ */
+
+func fractionToDecimal(num int, den int) string {
+	if num%den == 0 {
+		return strconv.Itoa(num / den)
 	}
-	ans := memo[num]
-	for cur := next(num, den); cur != num; cur = next(cur, den) {
-		if cur != num {
-			ans = ans + memo[cur]
-		}
+
+	s := ""
+	if (num < 0) != (den < 0) {
+		s = s + "-"
+		num, den = abs(num), abs(den)
 	}
-	return ans
+
+	s = s + strconv.Itoa(num/den)
+	fp := "."
+	r := num % den
+	memo := make(map[int]int)
+	for r != 0 && memo[r] == 0 {
+		memo[r] = len(fp)
+		r *= 10
+		fp = fp + strconv.Itoa(r/den)
+		r %= den
+	}
+
+	if r != 0 {
+		index := memo[r]
+		fp = fp[:index] + "(" + fp[index:] + ")"
+	}
+
+	return s + fp
 }
 
 func abs(x int) int {

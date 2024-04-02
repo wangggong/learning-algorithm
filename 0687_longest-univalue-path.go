@@ -57,45 +57,93 @@
  * }
  */
 
-var m map[*TreeNode]int
+/*
+ * var m map[*TreeNode]int
+ * var ans int
+ *
+ * func longestUnivaluePath(root *TreeNode) int {
+ * 	if root == nil {
+ * 		return 0
+ * 	}
+ * 	m = make(map[*TreeNode]int)
+ * 	ans = 0
+ * 	inorder(root)
+ * 	return ans - 1
+ * }
+ *
+ * func inorder(root *TreeNode) int {
+ * 	if root == nil {
+ * 		return 0
+ * 	}
+ * 	if v, ok := m[root]; ok {
+ * 		return v
+ * 	}
+ * 	v := 1
+ * 	defer func() {
+ * 		ans = max(ans, v)
+ * 		m[root] = v
+ * 	}()
+ * 	left, right := root.Left, root.Right
+ * 	leftVal, rightVal := inorder(left), inorder(right)
+ * 	if leftVal != 0 && rightVal != 0 && root.Val == right.Val && root.Val == left.Val {
+ * 		v = max(leftVal, rightVal) + 1
+ * 		ans = max(ans, leftVal+rightVal+1)
+ * 		return v
+ * 	}
+ * 	if leftVal != 0 && root.Val == left.Val {
+ * 		v += leftVal
+ * 	}
+ * 	if rightVal != 0 && root.Val == right.Val {
+ * 		v += rightVal
+ * 	}
+ * 	return v
+ * }
+ *
+ * func max(x, y int) int {
+ * 	if x > y {
+ * 		return x
+ * 	}
+ * 	return y
+ * }
+ */
+
+/**
+ * Definition for a binary tree node.
+ * type TreeNode struct {
+ *     Val int
+ *     Left *TreeNode
+ *     Right *TreeNode
+ * }
+ */
+
 var ans int
 
 func longestUnivaluePath(root *TreeNode) int {
-	if root == nil {
-		return 0
-	}
-	m = make(map[*TreeNode]int)
 	ans = 0
-	inorder(root)
-	return ans - 1
+	if root != nil {
+		traversal(root)
+	}
+	return ans
 }
 
-func inorder(root *TreeNode) int {
-	if root == nil {
-		return 0
+func traversal(root *TreeNode) (tot int, mx int) {
+	defer func() { ans = max(ans, tot-1) }()
+	tot, mx = 1, 1
+	if root.Left != nil {
+		_, l := traversal(root.Left)
+		if root.Left.Val == root.Val {
+			tot += l
+			mx = max(mx, l+1)
+		}
 	}
-	if v, ok := m[root]; ok {
-		return v
+	if root.Right != nil {
+		_, r := traversal(root.Right)
+		if root.Right.Val == root.Val {
+			tot += r
+			mx = max(mx, r+1)
+		}
 	}
-	v := 1
-	defer func() {
-		ans = max(ans, v)
-		m[root] = v
-	}()
-	left, right := root.Left, root.Right
-	leftVal, rightVal := inorder(left), inorder(right)
-	if leftVal != 0 && rightVal != 0 && root.Val == right.Val && root.Val == left.Val {
-		v = max(leftVal, rightVal) + 1
-		ans = max(ans, leftVal+rightVal+1)
-		return v
-	}
-	if leftVal != 0 && root.Val == left.Val {
-		v += leftVal
-	}
-	if rightVal != 0 && root.Val == right.Val {
-		v += rightVal
-	}
-	return v
+	return
 }
 
 func max(x, y int) int {

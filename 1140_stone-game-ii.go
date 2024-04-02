@@ -1,3 +1,5 @@
+import "math"
+
 /*
  * @lc app=leetcode.cn id=stone-game-ii lang=golang
  *
@@ -115,3 +117,33 @@ func stoneGameII(piles []int) int {
 	v, _ := minMax(piles, 0, 1)
 	return v
 }
+
+type Key struct{ K, M int }
+
+func dfs(S []int, k, M int, memo map[Key]int) (ans int) {
+	key := Key{k, M}
+	if _, ok := memo[key]; ok {
+		return memo[key]
+	}
+	defer func() { memo[key] = ans }()
+	if k+2*M >= len(S) {
+		ans = S[k]
+		return
+	}
+	other := math.MaxInt32
+	for i := 1; i <= 2*M; i++ {
+		other = min(other, dfs(S, k+i, max(M, i), memo))
+	}
+	ans = S[k] - other
+	return
+}
+
+/*
+ * func stoneGameII(S []int) int {
+ * 	n := len(S)
+ * 	for i := n - 2; i >= 0; i-- {
+ * 		S[i] += S[i+1]
+ * 	}
+ * 	return dfs(S, 0, 1, make(map[Key]int))
+ * }
+ */

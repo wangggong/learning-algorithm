@@ -88,3 +88,25 @@ func preorder(arr []int, l, r int) *TreeNode {
 		Right: preorder(arr, maxInd+1, r),
 	}
 }
+
+/*
+ * // 单调栈解
+ * func constructMaximumBinaryTree(nums []int) *TreeNode {
+ * 	var nodes []*TreeNode
+ * 	for _, n := range nums {
+ * 		nodes = append(nodes, &TreeNode{Val: n})
+ * 	}
+ * 	var S []int
+ * 	for i, n := range nums {
+ * 		for len(S) > 0 && nums[S[len(S)-1]] < n {
+ * 			nodes[i].Left = nodes[S[len(S)-1]]
+ * 			S = S[:len(S)-1]
+ * 		}
+ * 		if len(S) > 0 {
+ * 			nodes[S[len(S)-1]].Right = nodes[i]
+ * 		}
+ * 		S = append(S, i)
+ * 	}
+ * 	return nodes[S[0]]
+ * }
+ */

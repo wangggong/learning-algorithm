@@ -40,6 +40,8 @@
  */
 
 // cnm 就这么简单. 按边权排序搞个并查集整一波就能通...
+//
+// Kruskal 模版题.
 import "sort"
 
 type UnionFind struct {
